@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Entrar - Biblioteca Pessoal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container auth-page">
+    <section class="card auth-card">
+        <h1>Entrar</h1>
+        <p class="muted">Acesse sua biblioteca pessoal.</p>
+
+        <div class="alert success" th:if="${successMessage != null}" th:text="${successMessage}"></div>
+        <div class="alert success" th:if="${param.registered != null}">
+            Cadastro realizado com sucesso. Faça login para continuar.
+        </div>
+        <div class="alert error" th:if="${param.error != null}">
+            E-mail ou senha inválidos.
+        </div>
+        <div class="alert success" th:if="${param.logout != null}">
+            Você saiu da aplicação com segurança.
+        </div>
+
+        <form th:action="@{/login}" method="post" class="form">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <label for="username">E-mail</label>
+            <input id="username" name="username" type="email" required autocomplete="email">
+
+            <label for="password">Senha</label>
+            <input id="password" name="password" type="password" required autocomplete="current-password">
+
+            <button type="submit" class="button primary full-width">Entrar</button>
+        </form>
+
+        <p class="center">
+            Ainda não tem conta?
+            <a th:href="@{/register}">Cadastre-se</a>
+        </p>
+    </section>
+</main>
+</body>
+</html>

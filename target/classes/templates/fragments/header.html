@@ -1,0 +1,18 @@
+<header class="app-header" th:fragment="header">
+    <div class="container header-content">
+        <a class="brand" th:href="@{/books}">Biblioteca Pessoal</a>
+
+        <nav class="nav">
+            <a th:if="${currentUserEmail != null}" th:href="@{/books}">Meus livros</a>
+            <a th:if="${currentUserEmail != null}" th:href="@{/books/new}">Novo livro</a>
+
+            <form th:if="${currentUserEmail != null}" th:action="@{/logout}" method="post" class="inline-form">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="link-button">Sair</button>
+            </form>
+
+            <a th:if="${currentUserEmail == null}" th:href="@{/login}">Entrar</a>
+            <a th:if="${currentUserEmail == null}" th:href="@{/register}">Cadastrar</a>
+        </nav>
+    </div>
+</header>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Meus livros - Biblioteca Pessoal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container page">
+    <section class="page-title">
+        <div>
+            <h1>Meus livros</h1>
+            <p class="muted" th:if="${currentUserName != null}">
+                Olá, <span th:text="${currentUserName}">Usuário</span>.
+            </p>
+        </div>
+
+        <a class="button primary" th:href="@{/books/new}">Cadastrar livro</a>
+    </section>
+
+    <div class="alert success" th:if="${successMessage != null}" th:text="${successMessage}"></div>
+    <div class="alert error" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+    <section class="card">
+        <form th:action="@{/books}" method="get" class="search-form">
+            <input name="q" type="search" placeholder="Buscar por título, autor, gênero ou ISBN" th:value="${query}">
+            <button type="submit" class="button secondary">Buscar</button>
+            <a th:if="${query != null and !query.isBlank()}" th:href="@{/books}" class="button ghost">Limpar</a>
+        </form>
+    </section>
+
+    <section class="book-grid" th:if="${!books.isEmpty()}">
+        <article class="card book-card" th:each="book : ${books}">
+            <div class="book-card-header">
+                <span class="badge" th:text="${book.status}">TO_READ</span>
+            </div>
+
+            <h2 th:text="${book.title}">Título</h2>
+            <p class="muted" th:text="${book.author}">Autor</p>
+
+            <dl class="book-meta">
+                <div th:if="${book.genre != null}">
+                    <dt>Gênero</dt>
+                    <dd th:text="${book.genre}">Gênero</dd>
+                </div>
+                <div th:if="${book.publicationYear != null}">
+                    <dt>Ano</dt>
+                    <dd th:text="${book.publicationYear}">2025</dd>
+                </div>
+                <div th:if="${book.totalPages != null}">
+                    <dt>Progresso</dt>
+                    <dd>
+                        <span th:text="${book.currentPage}">0</span> /
+                        <span th:text="${book.totalPages}">100</span> páginas
+                    </dd>
+                </div>
+            </dl>
+
+            <a class="button secondary full-width" th:href="@{/books/{id}(id=${book.id})}">
+                Ver detalhes
+            </a>
+        </article>
+    </section>
+
+    <section class="empty-state card" th:if="${books.isEmpty()}">
+        <h2>Nenhum livro encontrado</h2>
+        <p class="muted">Cadastre seu primeiro livro ou ajuste os termos da busca.</p>
+        <a class="button primary" th:href="@{/books/new}">Cadastrar livro</a>
+    </section>
+</main>
+</body>
+</html>

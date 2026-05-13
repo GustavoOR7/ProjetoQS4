@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${book.title} + ' - Biblioteca Pessoal'">Livro - Biblioteca Pessoal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container page narrow">
+    <div class="alert success" th:if="${successMessage != null}" th:text="${successMessage}"></div>
+    <div class="alert error" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+    <section class="card detail-card">
+        <div class="book-card-header">
+            <span class="badge" th:text="${book.status}">TO_READ</span>
+        </div>
+
+        <h1 th:text="${book.title}">Título</h1>
+        <p class="muted large" th:text="${book.author}">Autor</p>
+
+        <dl class="detail-list">
+            <div th:if="${book.isbn != null}">
+                <dt>ISBN</dt>
+                <dd th:text="${book.isbn}">ISBN</dd>
+            </div>
+            <div th:if="${book.publisher != null}">
+                <dt>Editora</dt>
+                <dd th:text="${book.publisher}">Editora</dd>
+            </div>
+            <div th:if="${book.publicationYear != null}">
+                <dt>Ano de publicação</dt>
+                <dd th:text="${book.publicationYear}">2025</dd>
+            </div>
+            <div th:if="${book.genre != null}">
+                <dt>Gênero</dt>
+                <dd th:text="${book.genre}">Gênero</dd>
+            </div>
+            <div th:if="${book.totalPages != null}">
+                <dt>Progresso</dt>
+                <dd>
+                    <span th:text="${book.currentPage}">0</span> /
+                    <span th:text="${book.totalPages}">100</span> páginas
+                </dd>
+            </div>
+            <div th:if="${book.description != null}">
+                <dt>Descrição</dt>
+                <dd th:text="${book.description}">Descrição</dd>
+            </div>
+        </dl>
+
+        <section class="progress-section" th:if="${book.totalPages != null}">
+            <h2>Atualizar progresso</h2>
+
+            <form th:action="@{/books/{id}/progress(id=${book.id})}" th:object="${progressForm}" method="post" class="form inline-progress-form">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                <label for="currentPage">Página atual</label>
+                <input id="currentPage" th:field="*{currentPage}" type="number" min="0" th:max="${book.totalPages}">
+                <button type="submit" class="button secondary">Atualizar</button>
+            </form>
+        </section>
+
+        <div class="actions wrap">
+            <a class="button primary" th:href="@{/books/{id}/edit(id=${book.id})}">Editar</a>
+
+            <form th:action="@{/books/{id}/abandon(id=${book.id})}" method="post">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="button warning">Marcar como abandonado</button>
+            </form>
+
+            <form th:action="@{/books/{id}/to-read(id=${book.id})}" method="post">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="button secondary">Mover para quero ler</button>
+            </form>
+
+            <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" onsubmit="return confirm('Tem certeza que deseja remover este livro?');">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="button danger">Remover</button>
+            </form>
+
+            <a class="button ghost" th:href="@{/books}">Voltar</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' - Biblioteca Pessoal'">Livro - Biblioteca Pessoal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container page narrow">
+    <section class="page-title">
+        <div>
+            <h1 th:text="${pageTitle}">Cadastrar livro</h1>
+            <p class="muted">Preencha os dados bibliográficos do livro.</p>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="alert error" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
+
+        <form th:action="@{${formAction}}" th:object="${bookForm}" method="post" class="form">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <label for="title">Título *</label>
+            <input id="title" th:field="*{title}" type="text" required maxlength="160">
+            <small class="field-error" th:errors="*{title}"></small>
+
+            <label for="author">Autor *</label>
+            <input id="author" th:field="*{author}" type="text" required maxlength="120">
+            <small class="field-error" th:errors="*{author}"></small>
+
+            <label for="isbn">ISBN</label>
+            <input id="isbn" th:field="*{isbn}" type="text" maxlength="20">
+            <small class="field-error" th:errors="*{isbn}"></small>
+
+            <label for="publisher">Editora</label>
+            <input id="publisher" th:field="*{publisher}" type="text" maxlength="120">
+            <small class="field-error" th:errors="*{publisher}"></small>
+
+            <div class="form-row">
+                <div>
+                    <label for="publicationYear">Ano de publicação</label>
+                    <input id="publicationYear" th:field="*{publicationYear}" type="number" min="1450" max="2100">
+                    <small class="field-error" th:errors="*{publicationYear}"></small>
+                </div>
+
+                <div>
+                    <label for="totalPages">Total de páginas</label>
+                    <input id="totalPages" th:field="*{totalPages}" type="number" min="1">
+                    <small class="field-error" th:errors="*{totalPages}"></small>
+                </div>
+            </div>
+
+            <label for="genre">Gênero</label>
+            <input id="genre" th:field="*{genre}" type="text" maxlength="80">
+            <small class="field-error" th:errors="*{genre}"></small>
+
+            <label for="description">Descrição</label>
+            <textarea id="description" th:field="*{description}" rows="5" maxlength="1000"></textarea>
+            <small class="field-error" th:errors="*{description}"></small>
+
+            <div class="actions">
+                <button type="submit" class="button primary" th:text="${submitLabel}">Salvar</button>
+                <a class="button ghost" th:href="@{/books}">Cancelar</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Erro - Biblioteca Pessoal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container page narrow">
+    <section class="card empty-state">
+        <h1>Algo deu errado</h1>
+        <p class="muted" th:text="${message}">Ocorreu um erro inesperado.</p>
+        <a class="button primary" th:href="@{/books}">Voltar</a>
+    </section>
+</main>
+</body>
+</html>
