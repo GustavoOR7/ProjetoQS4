@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CurrentUserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">biblioteca-pessoal</a> &gt; <a href="index.source.html" class="el_package">br.edu.qualidade.biblioteca.service</a> &gt; <span class="el_source">CurrentUserService.java</span></div><h1>CurrentUserService.java</h1><pre class="source lang-java linenums">package br.edu.qualidade.biblioteca.service;
+
+import br.edu.qualidade.biblioteca.domain.model.LibraryUser;
+import br.edu.qualidade.biblioteca.domain.repository.LibraryUserRepository;
+import br.edu.qualidade.biblioteca.service.exception.ResourceNotFoundException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.util.Locale;
+
+@Service
+public class CurrentUserService {
+
+    private final LibraryUserRepository userRepository;
+
+<span class="fc" id="L18">    public CurrentUserService(LibraryUserRepository userRepository) {</span>
+<span class="fc" id="L19">        this.userRepository = userRepository;</span>
+<span class="fc" id="L20">    }</span>
+
+    public LibraryUser getAuthenticatedUser() {
+<span class="fc" id="L23">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        if (authentication == null</span>
+<span class="pc bpc" id="L26" title="1 of 4 branches missed.">                || !authentication.isAuthenticated()</span>
+                || authentication instanceof AnonymousAuthenticationToken) {
+<span class="fc" id="L28">            throw new ResourceNotFoundException(&quot;Usuário autenticado não encontrado.&quot;);</span>
+        }
+
+<span class="fc" id="L31">        String email = authentication.getName().trim().toLowerCase(Locale.ROOT);</span>
+
+<span class="fc" id="L33">        return userRepository.findByEmail(email)</span>
+<span class="pc" id="L34">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuário autenticado não encontrado.&quot;));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

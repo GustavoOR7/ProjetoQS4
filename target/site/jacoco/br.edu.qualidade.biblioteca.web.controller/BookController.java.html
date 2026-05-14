@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">biblioteca-pessoal</a> &gt; <a href="index.source.html" class="el_package">br.edu.qualidade.biblioteca.web.controller</a> &gt; <span class="el_source">BookController.java</span></div><h1>BookController.java</h1><pre class="source lang-java linenums">package br.edu.qualidade.biblioteca.web.controller;
+
+import br.edu.qualidade.biblioteca.domain.model.Book;
+import br.edu.qualidade.biblioteca.domain.model.LibraryUser;
+import br.edu.qualidade.biblioteca.service.BookService;
+import br.edu.qualidade.biblioteca.service.CurrentUserService;
+import br.edu.qualidade.biblioteca.service.exception.BusinessRuleException;
+import br.edu.qualidade.biblioteca.web.form.BookForm;
+import br.edu.qualidade.biblioteca.web.form.ProgressForm;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+
+@Controller
+@RequestMapping(&quot;/books&quot;)
+public class BookController {
+
+    private final BookService bookService;
+    private final CurrentUserService currentUserService;
+
+    public BookController(
+            BookService bookService,
+            CurrentUserService currentUserService
+<span class="fc" id="L35">    ) {</span>
+<span class="fc" id="L36">        this.bookService = bookService;</span>
+<span class="fc" id="L37">        this.currentUserService = currentUserService;</span>
+<span class="fc" id="L38">    }</span>
+
+    @GetMapping
+    public String listBooks(
+            @RequestParam(name = &quot;q&quot;, required = false) String query,
+            Model model
+    ) {
+<span class="fc" id="L45">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+<span class="fc" id="L46">        List&lt;Book&gt; books = bookService.listBooks(currentUser.getId(), query);</span>
+
+<span class="fc" id="L48">        model.addAttribute(&quot;books&quot;, books);</span>
+<span class="fc" id="L49">        model.addAttribute(&quot;query&quot;, query);</span>
+
+<span class="fc" id="L51">        return &quot;books/list&quot;;</span>
+    }
+
+    @GetMapping(&quot;/new&quot;)
+    public String showCreateForm(Model model) {
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (!model.containsAttribute(&quot;bookForm&quot;)) {</span>
+<span class="fc" id="L57">            model.addAttribute(&quot;bookForm&quot;, new BookForm());</span>
+        }
+
+<span class="fc" id="L60">        model.addAttribute(&quot;pageTitle&quot;, &quot;Cadastrar livro&quot;);</span>
+<span class="fc" id="L61">        model.addAttribute(&quot;formAction&quot;, &quot;/books/new&quot;);</span>
+<span class="fc" id="L62">        model.addAttribute(&quot;submitLabel&quot;, &quot;Cadastrar&quot;);</span>
+
+<span class="fc" id="L64">        return &quot;books/form&quot;;</span>
+    }
+
+    @PostMapping(&quot;/new&quot;)
+    public String createBook(
+            @Valid @ModelAttribute(&quot;bookForm&quot;) BookForm bookForm,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (bindingResult.hasErrors()) {</span>
+<span class="fc" id="L75">            prepareCreateForm(model);</span>
+<span class="fc" id="L76">            return &quot;books/form&quot;;</span>
+        }
+
+<span class="fc" id="L79">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+
+        try {
+<span class="fc" id="L82">            Book createdBook = bookService.createBook(currentUser.getId(), bookForm);</span>
+
+<span class="fc" id="L84">            redirectAttributes.addFlashAttribute(</span>
+                    &quot;successMessage&quot;,
+                    &quot;Livro cadastrado com sucesso.&quot;
+            );
+
+<span class="fc" id="L89">            return &quot;redirect:/books/&quot; + createdBook.getId();</span>
+<span class="nc" id="L90">        } catch (BusinessRuleException exception) {</span>
+<span class="nc" id="L91">            bindingResult.addError(new ObjectError(&quot;bookForm&quot;, exception.getMessage()));</span>
+<span class="nc" id="L92">            prepareCreateForm(model);</span>
+<span class="nc" id="L93">            return &quot;books/form&quot;;</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public String showBookDetails(
+            @PathVariable String id,
+            Model model
+    ) {
+<span class="fc" id="L102">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+<span class="fc" id="L103">        Book book = bookService.getBookForOwner(id, currentUser.getId());</span>
+
+<span class="fc" id="L105">        ProgressForm progressForm = new ProgressForm();</span>
+<span class="fc" id="L106">        progressForm.setCurrentPage(book.getCurrentPage());</span>
+
+<span class="fc" id="L108">        model.addAttribute(&quot;book&quot;, book);</span>
+<span class="fc" id="L109">        model.addAttribute(&quot;progressForm&quot;, progressForm);</span>
+
+<span class="fc" id="L111">        return &quot;books/detail&quot;;</span>
+    }
+
+    @GetMapping(&quot;/{id}/edit&quot;)
+    public String showEditForm(
+            @PathVariable String id,
+            Model model
+    ) {
+<span class="nc" id="L119">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+<span class="nc" id="L120">        Book book = bookService.getBookForOwner(id, currentUser.getId());</span>
+
+<span class="nc" id="L122">        model.addAttribute(&quot;bookForm&quot;, BookForm.from(book));</span>
+<span class="nc" id="L123">        model.addAttribute(&quot;pageTitle&quot;, &quot;Editar livro&quot;);</span>
+<span class="nc" id="L124">        model.addAttribute(&quot;formAction&quot;, &quot;/books/&quot; + id + &quot;/edit&quot;);</span>
+<span class="nc" id="L125">        model.addAttribute(&quot;submitLabel&quot;, &quot;Salvar alterações&quot;);</span>
+
+<span class="nc" id="L127">        return &quot;books/form&quot;;</span>
+    }
+
+    @PostMapping(&quot;/{id}/edit&quot;)
+    public String updateBook(
+            @PathVariable String id,
+            @Valid @ModelAttribute(&quot;bookForm&quot;) BookForm bookForm,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        if (bindingResult.hasErrors()) {</span>
+<span class="nc" id="L139">            prepareEditForm(model, id);</span>
+<span class="nc" id="L140">            return &quot;books/form&quot;;</span>
+        }
+
+<span class="nc" id="L143">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+
+        try {
+<span class="nc" id="L146">            bookService.updateBook(id, currentUser.getId(), bookForm);</span>
+
+<span class="nc" id="L148">            redirectAttributes.addFlashAttribute(</span>
+                    &quot;successMessage&quot;,
+                    &quot;Livro atualizado com sucesso.&quot;
+            );
+
+<span class="nc" id="L153">            return &quot;redirect:/books/&quot; + id;</span>
+<span class="nc" id="L154">        } catch (BusinessRuleException exception) {</span>
+<span class="nc" id="L155">            bindingResult.addError(new ObjectError(&quot;bookForm&quot;, exception.getMessage()));</span>
+<span class="nc" id="L156">            prepareEditForm(model, id);</span>
+<span class="nc" id="L157">            return &quot;books/form&quot;;</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/progress&quot;)
+    public String updateProgress(
+            @PathVariable String id,
+            @Valid @ModelAttribute(&quot;progressForm&quot;) ProgressForm progressForm,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if (bindingResult.hasErrors()) {</span>
+<span class="nc" id="L169">            redirectAttributes.addFlashAttribute(</span>
+                    &quot;errorMessage&quot;,
+                    &quot;Informe uma página atual válida.&quot;
+            );
+<span class="nc" id="L173">            return &quot;redirect:/books/&quot; + id;</span>
+        }
+
+<span class="fc" id="L176">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+
+        try {
+<span class="fc" id="L179">            bookService.updateProgress(id, currentUser.getId(), progressForm.getCurrentPage());</span>
+
+<span class="fc" id="L181">            redirectAttributes.addFlashAttribute(</span>
+                    &quot;successMessage&quot;,
+                    &quot;Progresso atualizado com sucesso.&quot;
+            );
+<span class="fc" id="L185">        } catch (BusinessRuleException exception) {</span>
+<span class="fc" id="L186">            redirectAttributes.addFlashAttribute(&quot;errorMessage&quot;, exception.getMessage());</span>
+<span class="fc" id="L187">        }</span>
+
+<span class="fc" id="L189">        return &quot;redirect:/books/&quot; + id;</span>
+    }
+
+    @PostMapping(&quot;/{id}/abandon&quot;)
+    public String markAsAbandoned(
+            @PathVariable String id,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="nc" id="L197">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+<span class="nc" id="L198">        bookService.markAsAbandoned(id, currentUser.getId());</span>
+
+<span class="nc" id="L200">        redirectAttributes.addFlashAttribute(</span>
+                &quot;successMessage&quot;,
+                &quot;Livro marcado como abandonado.&quot;
+        );
+
+<span class="nc" id="L205">        return &quot;redirect:/books/&quot; + id;</span>
+    }
+
+    @PostMapping(&quot;/{id}/to-read&quot;)
+    public String markAsToRead(
+            @PathVariable String id,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="nc" id="L213">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+<span class="nc" id="L214">        bookService.markAsToRead(id, currentUser.getId());</span>
+
+<span class="nc" id="L216">        redirectAttributes.addFlashAttribute(</span>
+                &quot;successMessage&quot;,
+                &quot;Livro movido para a lista de leitura.&quot;
+        );
+
+<span class="nc" id="L221">        return &quot;redirect:/books/&quot; + id;</span>
+    }
+
+    @PostMapping(&quot;/{id}/delete&quot;)
+    public String deleteBook(
+            @PathVariable String id,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="fc" id="L229">        LibraryUser currentUser = currentUserService.getAuthenticatedUser();</span>
+<span class="fc" id="L230">        bookService.deleteBook(id, currentUser.getId());</span>
+
+<span class="fc" id="L232">        redirectAttributes.addFlashAttribute(</span>
+                &quot;successMessage&quot;,
+                &quot;Livro removido com sucesso.&quot;
+        );
+
+<span class="fc" id="L237">        return &quot;redirect:/books&quot;;</span>
+    }
+
+    private void prepareCreateForm(Model model) {
+<span class="fc" id="L241">        model.addAttribute(&quot;pageTitle&quot;, &quot;Cadastrar livro&quot;);</span>
+<span class="fc" id="L242">        model.addAttribute(&quot;formAction&quot;, &quot;/books/new&quot;);</span>
+<span class="fc" id="L243">        model.addAttribute(&quot;submitLabel&quot;, &quot;Cadastrar&quot;);</span>
+<span class="fc" id="L244">    }</span>
+
+    private void prepareEditForm(Model model, String bookId) {
+<span class="nc" id="L247">        model.addAttribute(&quot;pageTitle&quot;, &quot;Editar livro&quot;);</span>
+<span class="nc" id="L248">        model.addAttribute(&quot;formAction&quot;, &quot;/books/&quot; + bookId + &quot;/edit&quot;);</span>
+<span class="nc" id="L249">        model.addAttribute(&quot;submitLabel&quot;, &quot;Salvar alterações&quot;);</span>
+<span class="nc" id="L250">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -27,7 +27,7 @@ public class BookService {
             return bookRepository.findByOwnerUserIdOrderByCreatedAtDesc(ownerUserId);
         }
 
-        String escapedSearchTerm = Pattern.quote(searchTerm.trim());
+                String escapedSearchTerm = escapeRegex(searchTerm.trim());
 
         return bookRepository.searchByOwnerUserIdAndTerm(
                 ownerUserId,
@@ -131,4 +131,8 @@ public class BookService {
                     throw new BusinessRuleException("Já existe um livro com este ISBN na sua biblioteca.");
                 });
     }
+    private String escapeRegex(String value) {
+    return value.replaceAll("([\\\\.\\[\\]{}()*+?^$|])", "\\\\$1");
+    }
 }
+

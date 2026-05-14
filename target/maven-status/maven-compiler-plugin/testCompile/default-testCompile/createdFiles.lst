@@ -1,0 +1,12 @@
+br/edu/qualidade/biblioteca/testsupport/AbstractMongoContainerTest.class
+br/edu/qualidade/biblioteca/domain/model/LibraryUserTest.class
+br/edu/qualidade/biblioteca/domain/repository/BookRepositoryIT.class
+br/edu/qualidade/biblioteca/service/BookServiceIT.class
+br/edu/qualidade/biblioteca/testsupport/HttpTestSupport.class
+br/edu/qualidade/biblioteca/web/controller/BookControllerIT.class
+br/edu/qualidade/biblioteca/web/form/BookFormTest.class
+br/edu/qualidade/biblioteca/domain/repository/LibraryUserRepositoryIT.class
+br/edu/qualidade/biblioteca/web/controller/AuthControllerIT.class
+br/edu/qualidade/biblioteca/service/RegistrationServiceIT.class
+br/edu/qualidade/biblioteca/domain/model/BookWhiteBoxTest.class
+br/edu/qualidade/biblioteca/web/controller/HomeControllerIT.class

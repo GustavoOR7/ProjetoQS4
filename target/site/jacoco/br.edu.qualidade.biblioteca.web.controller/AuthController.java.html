@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">biblioteca-pessoal</a> &gt; <a href="index.source.html" class="el_package">br.edu.qualidade.biblioteca.web.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package br.edu.qualidade.biblioteca.web.controller;
+
+import br.edu.qualidade.biblioteca.service.RegistrationService;
+import br.edu.qualidade.biblioteca.service.exception.BusinessRuleException;
+import br.edu.qualidade.biblioteca.web.form.RegistrationForm;
+import jakarta.validation.Valid;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+public class AuthController {
+
+    private final RegistrationService registrationService;
+
+<span class="fc" id="L23">    public AuthController(RegistrationService registrationService) {</span>
+<span class="fc" id="L24">        this.registrationService = registrationService;</span>
+<span class="fc" id="L25">    }</span>
+
+    @GetMapping(&quot;/login&quot;)
+    public String login(Authentication authentication) {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        if (isAuthenticated(authentication)) {</span>
+<span class="nc" id="L30">            return &quot;redirect:/books&quot;;</span>
+        }
+
+<span class="fc" id="L33">        return &quot;auth/login&quot;;</span>
+    }
+
+    @GetMapping(&quot;/register&quot;)
+    public String showRegistrationForm(Model model, Authentication authentication) {
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if (isAuthenticated(authentication)) {</span>
+<span class="nc" id="L39">            return &quot;redirect:/books&quot;;</span>
+        }
+
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (!model.containsAttribute(&quot;registrationForm&quot;)) {</span>
+<span class="fc" id="L43">            model.addAttribute(&quot;registrationForm&quot;, new RegistrationForm());</span>
+        }
+
+<span class="fc" id="L46">        return &quot;auth/register&quot;;</span>
+    }
+
+    @PostMapping(&quot;/register&quot;)
+    public String register(
+            @Valid @ModelAttribute(&quot;registrationForm&quot;) RegistrationForm registrationForm,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        if (bindingResult.hasErrors()) {</span>
+<span class="nc" id="L56">            return &quot;auth/register&quot;;</span>
+        }
+
+        try {
+<span class="fc" id="L60">            registrationService.register(registrationForm);</span>
+<span class="fc" id="L61">        } catch (BusinessRuleException exception) {</span>
+<span class="fc" id="L62">            bindingResult.addError(new ObjectError(&quot;registrationForm&quot;, exception.getMessage()));</span>
+<span class="fc" id="L63">            return &quot;auth/register&quot;;</span>
+<span class="fc" id="L64">        }</span>
+
+<span class="fc" id="L66">        redirectAttributes.addFlashAttribute(</span>
+                &quot;successMessage&quot;,
+                &quot;Cadastro realizado com sucesso. Faça login para continuar.&quot;
+        );
+
+<span class="fc" id="L71">        return &quot;redirect:/login?registered&quot;;</span>
+    }
+
+    private boolean isAuthenticated(Authentication authentication) {
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        return authentication != null</span>
+<span class="pc bnc" id="L76" title="All 4 branches missed.">                &amp;&amp; authentication.isAuthenticated()</span>
+                &amp;&amp; !(authentication instanceof AnonymousAuthenticationToken);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

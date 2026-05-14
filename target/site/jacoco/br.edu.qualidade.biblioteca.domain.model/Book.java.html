@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Book.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">biblioteca-pessoal</a> &gt; <a href="index.source.html" class="el_package">br.edu.qualidade.biblioteca.domain.model</a> &gt; <span class="el_source">Book.java</span></div><h1>Book.java</h1><pre class="source lang-java linenums">package br.edu.qualidade.biblioteca.domain.model;
+
+import br.edu.qualidade.biblioteca.domain.valueobject.BookStatus;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.Instant;
+import java.util.Objects;
+
+@Document(collection = &quot;books&quot;)
+@CompoundIndexes({
+        @CompoundIndex(
+                name = &quot;idx_books_owner_title_author&quot;,
+                def = &quot;{ 'ownerUserId': 1, 'title': 1, 'author': 1 }&quot;
+        ),
+        @CompoundIndex(
+                name = &quot;idx_books_owner_isbn_unique_sparse&quot;,
+                def = &quot;{ 'ownerUserId': 1, 'isbn': 1 }&quot;,
+                unique = true,
+                sparse = true
+        )
+})
+public class Book {
+
+    @Id
+    private String id;
+
+    @NotBlank(message = &quot;O livro precisa estar associado a um usuário.&quot;)
+    private String ownerUserId;
+
+    @NotBlank(message = &quot;O título é obrigatório.&quot;)
+    @Size(min = 2, max = 160, message = &quot;O título deve ter entre 2 e 160 caracteres.&quot;)
+    private String title;
+
+    @NotBlank(message = &quot;O autor é obrigatório.&quot;)
+    @Size(min = 2, max = 120, message = &quot;O autor deve ter entre 2 e 120 caracteres.&quot;)
+    private String author;
+
+    @Size(max = 20, message = &quot;O ISBN deve ter no máximo 20 caracteres.&quot;)
+    private String isbn;
+
+    @Size(max = 120, message = &quot;A editora deve ter no máximo 120 caracteres.&quot;)
+    private String publisher;
+
+    @Min(value = 1450, message = &quot;O ano de publicação deve ser maior ou igual a 1450.&quot;)
+    @Max(value = 2100, message = &quot;O ano de publicação deve ser menor ou igual a 2100.&quot;)
+    private Integer publicationYear;
+
+    @Size(max = 80, message = &quot;O gênero deve ter no máximo 80 caracteres.&quot;)
+    private String genre;
+
+    @Size(max = 1000, message = &quot;A descrição deve ter no máximo 1000 caracteres.&quot;)
+    private String description;
+
+    @Positive(message = &quot;O total de páginas deve ser maior que zero.&quot;)
+    private Integer totalPages;
+
+    @PositiveOrZero(message = &quot;A página atual não pode ser negativa.&quot;)
+    private Integer currentPage;
+
+    private BookStatus status;
+
+    private Instant finishedAt;
+
+    @CreatedDate
+    private Instant createdAt;
+
+    @LastModifiedDate
+    private Instant updatedAt;
+
+    @Version
+    private Long version;
+
+<span class="fc" id="L85">    protected Book() {</span>
+        // Necessário para o Spring Data MongoDB.
+<span class="fc" id="L87">    }</span>
+
+    public Book(
+            String ownerUserId,
+            String title,
+            String author,
+            String isbn,
+            String publisher,
+            Integer publicationYear,
+            String genre,
+            String description,
+            Integer totalPages
+<span class="fc" id="L99">    ) {</span>
+<span class="fc" id="L100">        this.ownerUserId = normalizeRequired(ownerUserId);</span>
+<span class="fc" id="L101">        this.title = normalizeRequired(title);</span>
+<span class="fc" id="L102">        this.author = normalizeRequired(author);</span>
+<span class="fc" id="L103">        this.isbn = normalizeOptional(isbn);</span>
+<span class="fc" id="L104">        this.publisher = normalizeOptional(publisher);</span>
+<span class="fc" id="L105">        this.publicationYear = publicationYear;</span>
+<span class="fc" id="L106">        this.genre = normalizeOptional(genre);</span>
+<span class="fc" id="L107">        this.description = normalizeOptional(description);</span>
+<span class="fc" id="L108">        this.totalPages = totalPages;</span>
+<span class="fc" id="L109">        this.currentPage = 0;</span>
+<span class="fc" id="L110">        this.status = BookStatus.TO_READ;</span>
+
+<span class="fc" id="L112">        validatePageInvariant(this.currentPage, this.totalPages);</span>
+<span class="fc" id="L113">    }</span>
+
+    public void updateBibliographicData(
+            String title,
+            String author,
+            String isbn,
+            String publisher,
+            Integer publicationYear,
+            String genre,
+            String description,
+            Integer totalPages
+    ) {
+<span class="fc" id="L125">        this.title = normalizeRequired(title);</span>
+<span class="fc" id="L126">        this.author = normalizeRequired(author);</span>
+<span class="fc" id="L127">        this.isbn = normalizeOptional(isbn);</span>
+<span class="fc" id="L128">        this.publisher = normalizeOptional(publisher);</span>
+<span class="fc" id="L129">        this.publicationYear = publicationYear;</span>
+<span class="fc" id="L130">        this.genre = normalizeOptional(genre);</span>
+<span class="fc" id="L131">        this.description = normalizeOptional(description);</span>
+<span class="fc" id="L132">        this.totalPages = totalPages;</span>
+
+<span class="fc" id="L134">        validatePageInvariant(this.currentPage, this.totalPages);</span>
+<span class="fc" id="L135">    }</span>
+
+    public void updateProgress(Integer newCurrentPage) {
+<span class="fc" id="L138">        int safePage = Objects.requireNonNullElse(newCurrentPage, 0);</span>
+
+<span class="fc" id="L140">        validatePageInvariant(safePage, this.totalPages);</span>
+
+<span class="fc" id="L142">        this.currentPage = safePage;</span>
+
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (safePage == 0) {</span>
+<span class="fc" id="L145">            this.status = BookStatus.TO_READ;</span>
+<span class="fc" id="L146">            this.finishedAt = null;</span>
+<span class="fc" id="L147">            return;</span>
+        }
+
+<span class="pc bpc" id="L150" title="1 of 4 branches missed.">        if (this.totalPages != null &amp;&amp; safePage == this.totalPages) {</span>
+<span class="fc" id="L151">            this.status = BookStatus.FINISHED;</span>
+<span class="fc" id="L152">            this.finishedAt = Instant.now();</span>
+<span class="fc" id="L153">            return;</span>
+        }
+
+<span class="fc" id="L156">        this.status = BookStatus.READING;</span>
+<span class="fc" id="L157">        this.finishedAt = null;</span>
+<span class="fc" id="L158">    }</span>
+
+    public void markAsAbandoned() {
+<span class="fc" id="L161">        this.status = BookStatus.ABANDONED;</span>
+<span class="fc" id="L162">        this.finishedAt = null;</span>
+<span class="fc" id="L163">    }</span>
+
+    public void markAsToRead() {
+<span class="fc" id="L166">        this.currentPage = 0;</span>
+<span class="fc" id="L167">        this.status = BookStatus.TO_READ;</span>
+<span class="fc" id="L168">        this.finishedAt = null;</span>
+<span class="fc" id="L169">    }</span>
+
+    public boolean belongsTo(String userId) {
+<span class="pc bpc" id="L172" title="1 of 4 branches missed.">        return this.ownerUserId != null &amp;&amp; this.ownerUserId.equals(userId);</span>
+    }
+
+    private static void validatePageInvariant(Integer currentPage, Integer totalPages) {
+<span class="pc bpc" id="L176" title="1 of 4 branches missed.">        if (currentPage != null &amp;&amp; currentPage &lt; 0) {</span>
+<span class="fc" id="L177">            throw new IllegalArgumentException(&quot;A página atual não pode ser negativa.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L180" title="1 of 4 branches missed.">        if (totalPages != null &amp;&amp; totalPages &lt;= 0) {</span>
+<span class="fc" id="L181">            throw new IllegalArgumentException(&quot;O total de páginas deve ser maior que zero.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L184" title="2 of 6 branches missed.">        if (currentPage != null &amp;&amp; totalPages != null &amp;&amp; currentPage &gt; totalPages) {</span>
+<span class="fc" id="L185">            throw new IllegalArgumentException(&quot;A página atual não pode ser maior que o total de páginas.&quot;);</span>
+        }
+<span class="fc" id="L187">    }</span>
+
+    private static String normalizeRequired(String value) {
+<span class="pc bpc" id="L190" title="2 of 4 branches missed.">        if (value == null || value.isBlank()) {</span>
+<span class="nc" id="L191">            return value;</span>
+        }
+<span class="fc" id="L193">        return value.trim();</span>
+    }
+
+    private static String normalizeOptional(String value) {
+<span class="fc bfc" id="L197" title="All 4 branches covered.">        if (value == null || value.isBlank()) {</span>
+<span class="fc" id="L198">            return null;</span>
+        }
+<span class="fc" id="L200">        return value.trim();</span>
+    }
+
+    public String getId() {
+<span class="fc" id="L204">        return id;</span>
+    }
+
+    public String getOwnerUserId() {
+<span class="fc" id="L208">        return ownerUserId;</span>
+    }
+
+    public String getTitle() {
+<span class="fc" id="L212">        return title;</span>
+    }
+
+    public String getAuthor() {
+<span class="fc" id="L216">        return author;</span>
+    }
+
+    public String getIsbn() {
+<span class="fc" id="L220">        return isbn;</span>
+    }
+
+    public String getPublisher() {
+<span class="fc" id="L224">        return publisher;</span>
+    }
+
+    public Integer getPublicationYear() {
+<span class="fc" id="L228">        return publicationYear;</span>
+    }
+
+    public String getGenre() {
+<span class="fc" id="L232">        return genre;</span>
+    }
+
+    public String getDescription() {
+<span class="fc" id="L236">        return description;</span>
+    }
+
+    public Integer getTotalPages() {
+<span class="fc" id="L240">        return totalPages;</span>
+    }
+
+    public Integer getCurrentPage() {
+<span class="fc" id="L244">        return currentPage;</span>
+    }
+
+    public BookStatus getStatus() {
+<span class="fc" id="L248">        return status;</span>
+    }
+
+    public Instant getFinishedAt() {
+<span class="fc" id="L252">        return finishedAt;</span>
+    }
+
+    public Instant getCreatedAt() {
+<span class="fc" id="L256">        return createdAt;</span>
+    }
+
+    public Instant getUpdatedAt() {
+<span class="fc" id="L260">        return updatedAt;</span>
+    }
+
+    public Long getVersion() {
+<span class="nc" id="L264">        return version;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

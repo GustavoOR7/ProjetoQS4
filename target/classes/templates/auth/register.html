@@ -9,17 +9,21 @@
 <body>
 <div th:replace="~{fragments/header :: header}"></div>
 
-<main class="container auth-page">
-    <section class="card auth-card">
-        <h1>Criar conta</h1>
-        <p class="muted">Cadastre-se para gerenciar seus livros.</p>
+    <main class="container auth-page">
+        <section class="card auth-card">
+            <h1>Criar conta</h1>
+            <p class="muted">Cadastre-se para gerenciar seus livros.</p>
 
-        <div class="alert error" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
+            <form th:action="@{/register}" th:object="${registrationForm}" method="post" class="form">
+        <div class="alert error"
+            th:if="${#fields.hasGlobalErrors()}"
+            th:each="error : ${#fields.globalErrors()}"
+            th:text="${error}">
+        </div>
 
-        <form th:action="@{/register}" th:object="${registrationForm}" method="post" class="form">
-            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-            <label for="name">Nome</label>
+    <label for="name">Nome</label>
             <input id="name" th:field="*{name}" type="text" required autocomplete="name">
             <small class="field-error" th:errors="*{name}"></small>
 

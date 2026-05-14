@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: br.edu.qualidade.biblioteca.web.controller.BookControllerIT
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.621 s -- in br.edu.qualidade.biblioteca.web.controller.BookControllerIT

@@ -18,9 +18,12 @@
     </section>
 
     <section class="card">
-        <div class="alert error" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
-
         <form th:action="@{${formAction}}" th:object="${bookForm}" method="post" class="form">
+    <div class="alert error"
+         th:if="${#fields.hasGlobalErrors()}"
+         th:each="error : ${#fields.globalErrors()}"
+         th:text="${error}">
+    </div>
             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
             <label for="title">Título *</label>

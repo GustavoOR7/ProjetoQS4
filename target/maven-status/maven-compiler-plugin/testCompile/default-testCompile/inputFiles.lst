@@ -1,0 +1,12 @@
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/domain/model/BookWhiteBoxTest.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/domain/model/LibraryUserTest.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/domain/repository/BookRepositoryIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/domain/repository/LibraryUserRepositoryIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/service/BookServiceIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/service/RegistrationServiceIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/testsupport/AbstractMongoContainerTest.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/testsupport/HttpTestSupport.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/web/controller/AuthControllerIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/web/controller/BookControllerIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/web/controller/HomeControllerIT.java
+/workspaces/ProjetoQS4/src/test/java/br/edu/qualidade/biblioteca/web/form/BookFormTest.java
