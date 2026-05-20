@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: br.edu.qualidade.biblioteca.domain.repository.BookRepositoryIT
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.218 s -- in br.edu.qualidade.biblioteca.domain.repository.BookRepositoryIT
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.179 s -- in br.edu.qualidade.biblioteca.domain.repository.BookRepositoryIT

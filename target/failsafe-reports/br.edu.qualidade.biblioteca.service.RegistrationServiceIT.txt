@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: br.edu.qualidade.biblioteca.service.RegistrationServiceIT
 -------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 17.50 s -- in br.edu.qualidade.biblioteca.service.RegistrationServiceIT
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 20.61 s -- in br.edu.qualidade.biblioteca.service.RegistrationServiceIT
